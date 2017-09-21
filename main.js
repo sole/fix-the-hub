@@ -1,45 +1,60 @@
-var tasks = {
-	// Remove the headache inducing carousel
-	'carousel': () => { return hideBySelector('.carousel'); },
-	// Remove the space eating, redundant footer
-	'footer': () => { return hideBySelector('footer.ng-scope'); },
-	// Same for the breadcrumbs
-	'breadcrumbs': () => { return hideBySelector('.breadcrumbs-container'); },
-};
+fixAllTheThings();
 
-var maxTime = 10000; // 10 seconds before giving up
-var startTime = Date.now();
-fixThings();
-console.log('starting at', startTime);
-
-function fixThings() {
-	var keys = Object.keys(tasks);
-
-	var num = keys.length;
-	console.log('SOLE!', num);
-	if(num == 0) {
-		console.log('ALL DONE');
-		return;
+// Since the front end is a funny Angular app kind of thing, the url can change
+// and a new page can show up too... with new things to remove! So check for that too
+var oldLocation = location.href;
+setInterval(function() {
+	if(location.href != oldLocation) {
+		fixAllTheThings();
+		oldLocation = location.href
 	}
+}, 1000);
 
-	for(var i = 0; i < num; i++) {
-		var k = keys[i];
-		var task = tasks[k];
-		var result = task();
+function fixAllTheThings() {
 
-		if(result) {
-			delete(tasks[k]);
+	var tasks = {
+		// Remove the headache inducing carousel
+		'carousel': () => { return hideBySelector('.carousel'); },
+		// Remove the space eating, redundant footer
+		'footer': () => { return hideBySelector('footer.ng-scope'); },
+		// Same for the breadcrumbs
+		'breadcrumbs': () => { return hideBySelector('.breadcrumbs-container'); },
+	};
+
+	var maxTime = 40000; // 40 seconds before giving up
+	var startTime = Date.now();
+	fixThings();
+	console.log('starting at', startTime);
+
+	function fixThings() {
+		var keys = Object.keys(tasks);
+
+		var num = keys.length;
+		console.log('SOLE!', num);
+		if(num == 0) {
+			console.log('ALL DONE');
+			return;
+		}
+
+		for(var i = 0; i < num; i++) {
+			var k = keys[i];
+			var task = tasks[k];
+			var result = task();
+
+			if(result) {
+				delete(tasks[k]);
+			}
+		}
+
+		var now = Date.now();
+		if(now - startTime < maxTime) {
+			requestAnimationFrame(fixThings);
+		} else {
+			console.log('giving up at', now);
 		}
 	}
 
-	var now = Date.now();
-	if(now - startTime < maxTime) {
-		requestAnimationFrame(fixThings);
-	} else {
-		console.log('giving up at', now);
-	}
 }
-
 
 /**
  * With some nodes it might be better to hide rather than removing, just in case events are associated to the node and things break subsequently
