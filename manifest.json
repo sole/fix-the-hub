@@ -1,0 +1,21 @@
+{
+
+  "manifest_version": 2,
+  "name": "Fix The Hub",
+  "version": "1.0",
+
+  "description": "Fixes things that annoy me in The Hub",
+
+  "icons": {
+    "48": "icons/icon48.png",
+    "96": "icons/icon96.png"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["*://mozilla.service-now.com/*"],
+      "js": ["main.js"]
+    }
+  ]
+
+}
