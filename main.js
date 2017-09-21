@@ -1,27 +1,43 @@
-var tasks = [
+var tasks = {
 	// Remove the headache inducing carousel
-	() => { return hideBySelector('.carousel'); },
+	'carousel': () => { return hideBySelector('.carousel'); },
 	// Remove the space eating, redundant footer
-	() => { return hideBySelector('footer.ng-scope'); }
-];
+	'footer': () => { return hideBySelector('footer.ng-scope'); },
+	// Same for the breadcrumbs
+	'breadcrumbs': () => { return hideBySelector('.breadcrumbs-container'); },
+};
 
-runNextTask();
+var maxTime = 10000; // 10 seconds before giving up
+var startTime = Date.now();
+fixThings();
+console.log('starting at', startTime);
 
-function runNextTask() {
+function fixThings() {
+	var keys = Object.keys(tasks);
 
-	if(tasks.length == 0) {
+	var num = keys.length;
+	console.log('SOLE!', num);
+	if(num == 0) {
+		console.log('ALL DONE');
 		return;
 	}
 
-	var task = tasks[0];
-	var result = task();
+	for(var i = 0; i < num; i++) {
+		var k = keys[i];
+		var task = tasks[k];
+		var result = task();
 
-	if(result) {
-		tasks.splice(0, 1);
+		if(result) {
+			delete(tasks[k]);
+		}
 	}
 
-	requestAnimationFrame(runNextTask);
-
+	var now = Date.now();
+	if(now - startTime < maxTime) {
+		requestAnimationFrame(fixThings);
+	} else {
+		console.log('giving up at', now);
+	}
 }
 
 
@@ -35,6 +51,7 @@ function hideNode(node) {
 function hideBySelector(sel) {
 	var node = document.querySelector(sel);
 	if(node) {
+		console.log('found', node);
 		hideNode(node);
 		return true;
 	}
